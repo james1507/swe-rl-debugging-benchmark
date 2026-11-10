@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Explore measured debugging benchmark results: intentional bugs, reference fixes, test evidence and reproducible evaluation."
+    />
+    <title>SWE RL — Benchmark Explorer</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%230c3e37'/%3E%3Ctext x='11' y='44' font-family='monospace' font-size='35' fill='%23a5f3d0'%3E%26lt;%26gt;%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.mjs"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to results</a>
+    <aside class="sidebar" aria-label="Project navigation">
+      <a href="./" class="brand"
+        ><span class="brand-icon" aria-hidden="true">&lt;/&gt;</span
+        ><span
+          >SWE RL<span class="brand-sub">Debugging benchmark</span></span
+        ></a
+      >
+      <div class="nav-label">WORKSPACE</div>
+      <nav>
+        <a class="nav-link active" href="#suite"
+          ><span aria-hidden="true">▦</span> Benchmark suite
+          <span class="nav-count" id="nav-count">—</span></a
+        >
+        <a class="nav-link" href="#evidence"
+          ><span aria-hidden="true">≡</span> Test evidence</a
+        >
+        <a class="nav-link" href="#workflow"
+          ><span aria-hidden="true">⌘</span> Evaluation workflow</a
+        >
+      </nav>
+      <div class="nav-label resources">PROJECT</div>
+      <nav>
+        <a class="nav-link" href="../architecture.md"
+          ><span aria-hidden="true">◇</span> Architecture</a
+        >
+        <a class="nav-link" href="../../rules/README.md"
+          ><span aria-hidden="true">☷</span> Contributor rules</a
+        >
+        <a class="nav-link" href="../../README.md"
+          ><span aria-hidden="true">↗</span> Documentation</a
+        >
+      </nav>
+      <div class="sidebar-note">
+        <span class="tiny-dot"></span> Built for reproducibility
+        <p>
+          Python standard library.<br />Docker evaluation. Verifiable fixes.
+        </p>
+        <span class="small-mono">REPORT SCHEMA v1</span>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="breadcrumb">
+          Workspace <span>/</span> <strong>Benchmark explorer</strong>
+        </div>
+        <div class="header-actions">
+          <span class="snapshot-label"
+            ><span class="tiny-dot"></span> Recorded evaluation</span
+          ><button class="button" id="open-report" type="button">
+            Open report <span aria-hidden="true">↗</span></button
+          ><input
+            id="report-file"
+            type="file"
+            accept=".json,application/json"
+            hidden
+            aria-label="Choose a benchmark JSON report"
+          />
+        </div>
+      </header>
+      <main id="main" tabindex="-1">
+        <p id="load-state" role="status">
+          Loading the recorded benchmark report…
+        </p>
+        <p id="load-error" class="error-message" role="alert" hidden></p>
+        <noscript
+          ><p class="error-message">
+            Enable JavaScript to explore results, or open
+            <a href="../evaluation-results.json">the raw report</a>.
+          </p></noscript
+        >
+        <div id="report-view" hidden>
+          <section class="hero" aria-labelledby="page-title">
+            <div>
+              <p class="eyebrow">SOFTWARE ENGINEERING · DEBUGGING EVALUATION</p>
+              <h1 id="page-title">
+                Real bugs.<br /><span>Verifiable fixes.</span>
+              </h1>
+              <p class="hero-copy">
+                A reproducible proving ground for debugging agents.<br />Inspect
+                the failures. Verify the fix. Keep the evidence.
+              </p>
+            </div>
+            <div class="run-card">
+              <div id="run-status" class="status-pill">Loading</div>
+              <p>RECORDED RUN</p>
+              <strong id="run-date">—</strong>
+              <div id="run-meta" class="run-meta">—</div>
+              <a
+                id="download-report"
+                class="text-link"
+                href="../evaluation-results.json"
+                download="benchmark-report.json"
+                >Download source report <span aria-hidden="true">↗</span></a
+              >
+            </div>
+          </section>
+          <section class="metrics" aria-label="Report summary">
+            <article class="metric">
+              <div class="metric-label">
+                Verifier cases <span aria-hidden="true">◈</span>
+              </div>
+              <strong id="case-count">—</strong
+              ><span id="case-caption">Across the benchmark suite</span>
+            </article>
+            <article class="metric">
+              <div class="metric-label">
+                Bugs reproduced <span aria-hidden="true">⌁</span>
+              </div>
+              <strong id="reproduced-count">—</strong
+              ><span id="reproduced-caption">Expected baseline failures</span>
+            </article>
+            <article class="metric">
+              <div id="solution-label" class="metric-label">
+                Reference checks <span aria-hidden="true">✓</span>
+              </div>
+              <strong id="solution-count" class="green">—</strong
+              ><span>Passing checks / evaluated checks</span>
+            </article>
+            <article class="metric">
+              <div class="metric-label">
+                Execution errors <span aria-hidden="true">⊘</span>
+              </div>
+              <strong id="error-count">—</strong
+              ><span>Separate from failing test cases</span>
+            </article>
+          </section>
+          <section
+            id="suite"
+            class="suite-section"
+            aria-labelledby="suite-title"
+          >
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">THE BENCHMARK</p>
+                <h2 id="suite-title">Three bugs. One clear contract.</h2>
+              </div>
+              <span class="small-mono" id="suite-meta">—</span>
+            </div>
+            <div class="suite-layout">
+              <div class="task-table">
+                <div class="task-table-head" aria-hidden="true">
+                  <span>CHALLENGE</span><span>BASELINE</span
+                  ><span>REFERENCE / CANDIDATE</span><span></span>
+                </div>
+                <div id="task-rows"></div>
+                <div class="table-foot">
+                  <span class="legend-dot amber"></span> A failing baseline
+                  proves the bug exists.<span class="legend-dot teal"></span> A
+                  passing reference verifies the fix.
+                </div>
+              </div>
+              <aside class="scoring-note">
+                <span class="note-icon" aria-hidden="true">◎</span>
+                <h3>Evidence over assumptions.</h3>
+                <p id="scoring-explainer">
+                  Both expectations must hold: the original code fails real
+                  tests, and the reference fix passes every check.
+                </p>
+                <div class="note-divider"></div>
+                <strong id="interpretation-title"
+                  >Reference validation ≠ AI score</strong
+                >
+                <p id="interpretation-copy">
+                  Reference fixes are checked against the task contract.
+                </p>
+              </aside>
+            </div>
+          </section>
+          <section
+            id="evidence"
+            class="evidence-section"
+            aria-labelledby="evidence-title"
+          >
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">UNDER THE HOOD</p>
+                <h2 id="evidence-title">Inspect the evidence.</h2>
+              </div>
+              <p class="section-hint">
+                Select a challenge above to explore its results.
+              </p>
+            </div>
+            <div class="evidence-card">
+              <div class="evidence-header">
+                <div>
+                  <span id="selected-id" class="task-number">01</span>
+                  <h3 id="selected-title">—</h3>
+                </div>
+                <div
+                  id="mode-controls"
+                  class="mode-controls"
+                  role="group"
+                  aria-label="Evaluation mode"
+                ></div>
+              </div>
+              <div class="evidence-body">
+                <div class="evidence-summary">
+                  <p id="evidence-mode" class="eyebrow">BASELINE</p>
+                  <h4 id="evidence-status">—</h4>
+                  <p id="evidence-description">—</p>
+                  <div class="outcome-counts" id="outcome-counts"></div>
+                  <a
+                    id="task-instruction"
+                    class="text-link"
+                    href="../../tasks/01-broken-banking-api/instruction.md"
+                    >Read task contract <span aria-hidden="true">↗</span></a
+                  >
+                </div>
+                <div class="test-evidence">
+                  <div class="evidence-label">
+                    <span id="test-list-label">TEST FAILURES</span
+                    ><span id="test-list-count">—</span>
+                  </div>
+                  <div id="test-list"></div>
+                  <details id="more-failures" hidden>
+                    <summary id="more-label">Show remaining failures</summary>
+                    <div id="remaining-tests"></div>
+                  </details>
+                </div>
+              </div>
+              <div class="fingerprints">
+                <span
+                  >SHA-256 · WORKSPACE <code id="workspace-hash">—</code></span
+                ><span>VERIFIER <code id="verifier-hash">—</code></span>
+              </div>
+            </div>
+          </section>
+          <section
+            id="workflow"
+            class="workflow-section"
+            aria-labelledby="workflow-title"
+          >
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">REPRODUCE IT</p>
+                <h2 id="workflow-title">
+                  From broken code to verified behavior.
+                </h2>
+              </div>
+            </div>
+            <div class="workflow-grid">
+              <article>
+                <span>01</span>
+                <h3>Prepare</h3>
+                <p>
+                  Export only the task environment and its written contract.
+                </p>
+              </article>
+              <article>
+                <span>02</span>
+                <h3>Repair</h3>
+                <p>Let an agent work in its own candidate workspace.</p>
+              </article>
+              <article>
+                <span>03</span>
+                <h3>Verify</h3>
+                <p>Run independent checks and keep JSON, JUnit and logs.</p>
+              </article>
+            </div>
+            <div class="command">
+              <span aria-hidden="true">$</span
+              ><code
+                >python3 -m runner.run_task --task all --mode both --engine
+                docker</code
+              >
+            </div>
+          </section>
+          <footer>
+            <span
+              >SWE RL Debugging Benchmark
+              <span class="footer-divider">/</span> Measured, not
+              simulated.</span
+            ><span id="source-label">Source: docs/evaluation-results.json</span>
+          </footer>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

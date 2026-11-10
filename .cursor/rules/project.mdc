@@ -1,0 +1,8 @@
+---
+description: Project-wide maintenance rules for SWE RL Debugging Benchmark
+alwaysApply: true
+---
+
+Read `AGENTS.md` and `rules/README.md` before editing this repository. Follow the linked architecture, benchmark-integrity, development and verification rules.
+
+All project content is English. Keep intentional task bugs intact, preserve evaluator semantics, and verify changes with the documented commands. Do not expose reference solutions or external verifiers to candidate agents.

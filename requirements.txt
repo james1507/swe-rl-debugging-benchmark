@@ -1,0 +1,21 @@
+# Resolved in Python 3.12 on 2026-11-10. Keep direct and transitive versions pinned.
+# Docker runner injects this file into each temporary build context.
+annotated-types==0.8.0
+anyio==4.16.0
+certifi==2026.10.23
+fastapi==0.115.12
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.20
+iniconfig==2.3.1
+packaging==26.3
+pluggy==1.7.0
+pydantic==2.11.4
+pydantic_core==2.33.2
+Pygments==2.21.0
+pytest==8.4.2
+PyYAML==6.0.2
+starlette==0.46.2
+typing-inspection==0.4.5
+typing_extensions==4.16.0

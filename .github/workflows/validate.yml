@@ -1,0 +1,49 @@
+name: Validate RL Tasks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  runner-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test evaluator without external dependencies
+        run: python -m unittest discover -s tests -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Test report boundary and demo metrics
+        run: node tests/test_demo.mjs
+  validate:
+    needs: runner-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        task: ['01', '02', '03']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate baseline and reference solution in Docker
+        run: python -m runner.run_task --task '${{ matrix.task }}' --mode both --engine docker --output-dir 'artifacts/task-${{ matrix.task }}'
+      - name: Preserve reports and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: task-${{ matrix.task }}-results
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 14
